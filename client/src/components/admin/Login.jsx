@@ -1,13 +1,30 @@
 import { useState } from "react";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
+  const { axios, setToken } = useAppContext();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
+    try {
+      const { data } = await axios.post("/api/admin/login", {
+        email,
+        password,
+      });
+      if (data.success) {
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
+        axios.defaults.headers.common["Authorization"] = `${data.token}`;
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   return (
     <div className='flex items-center justify-center h-screen'>
@@ -22,7 +39,10 @@ const Login = () => {
               Enter your credentials to access the admin panel
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="mt-6 w-full sm:max-w-md text-gray-600">
+          <form
+            onSubmit={handleSubmit}
+            className='mt-6 w-full sm:max-w-md text-gray-600'
+          >
             <div className='flex flex-col'>
               <label> Email </label>
               <input
@@ -45,7 +65,12 @@ const Login = () => {
                 required
               />
             </div>
-            <button type="submit" className="w-full py-3 font-medium bg-primary text-white rounded cursor-pointer hover:bg-primary/90 transition-all">Login</button>
+            <button
+              type='submit'
+              className='w-full py-3 font-medium bg-primary text-white rounded cursor-pointer hover:bg-primary/90 transition-all'
+            >
+              Login
+            </button>
           </form>
         </div>
       </div>

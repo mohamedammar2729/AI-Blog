@@ -11,9 +11,7 @@ export const adminLogin = (req, res) => {
       email !== process.env.ADMIN_EMAIL ||
       password !== process.env.ADMIN_PASSWORD
     ) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, {
