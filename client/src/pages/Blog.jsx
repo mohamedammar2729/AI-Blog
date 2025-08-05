@@ -1,31 +1,60 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { assets, blog_data, comments_data } from '../assets/assets';
-import Navbar from '../components/Navbar';
-import Moment from 'moment';
-import Footer from '../components/Footer';
-import Loader from '../components/Loader';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { assets } from "../assets/assets";
+import Navbar from "../components/Navbar";
+import Moment from "moment";
+import Footer from "../components/Footer";
+import Loader from "../components/Loader";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const Blog = () => {
   const { id } = useParams();
+  const { axios } = useAppContext();
+
   const [data, setData] = useState(null);
   const [comments, setComments] = useState([]);
-  const [name, setName] = useState('');
-  const [content, setContent] = useState('');
+
+  const [name, setName] = useState("");
+  const [content, setContent] = useState("");
   // Fetch blog data based on id
   const fetchBlogData = async () => {
-    const blog = blog_data.find((item) => item._id === id);
-    setData(blog);
+    try {
+      const { data } = await axios.get(`/api/blog/${id}`);
+      data.success ? setData(data.blog) : toast.error(data.message);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   // Fetch comments for the blog (if applicable)
   const fetchComments = async () => {
-    // Set comments state
-    setComments(comments_data);
+    try {
+      const { data } = await axios.post("/api/blog/comments", { blogId: id });
+      data.success ? setComments(data.comments) : toast.error(data.message);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   // Add a comment
   const addComment = async (e) => {
     e.preventDefault();
+    try {
+      const { data } = await axios.post("/api/blog/add-comment", {
+        blog: id,
+        name,
+        content,
+      });
+      if (data.success) {
+        toast.success(data.message);
+        setName("");
+        setContent("");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // Call fetchBlogData when component mounts
@@ -44,12 +73,12 @@ const Blog = () => {
       <Navbar />
       <div className='text-center mt-20 text-gray-600'>
         <p className='text-primary py-4 font-medium'>
-          Published on {Moment(data.createdAt).format('MMMM Do YYYY')}
+          Published on {Moment(data.createdAt).format("MMMM Do YYYY")}
         </p>
         <h1 className='text-2xl sm:text-5xl font-semibold max-w-2xl mx-auto text-gray-800'>
           {data.title}
         </h1>
-        <h2 className='my-5 max-w-lg truncate mx-auto'>{data.subtitle}</h2>
+        <h2 className='my-5 max-w-lg truncate mx-auto'>{data.subTitle}</h2>
         <p className='inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 bg-primary/5 font-medium text-primary'>
           Micheal Brown
         </p>
@@ -66,7 +95,7 @@ const Blog = () => {
           <div className='flex flex-col gap-4'>
             {comments.map((comment, index) => (
               <div
-                key={index}
+                key={index++}
                 className='relative bg-primary/2 border border-primary/5 max-w-xl p-4 rounded text-gray-600'
               >
                 <div className='flex items-center gap-2 mb-2'>

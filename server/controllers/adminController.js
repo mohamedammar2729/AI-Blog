@@ -14,9 +14,7 @@ export const adminLogin = (req, res) => {
       return res.json({ success: false, message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ email }, process.env.JWT_SECRET);
 
     return res
       .status(200)
@@ -62,18 +60,18 @@ export const getDashboard = async (req, res) => {
       })
       .limit(5);
     const blogs = await Blog.countDocuments();
-    const totalComments = await Comment.countDocuments();
-    const draftBlogs = await Blog.countDocuments({ isPublished: false });
+    const Comments = await Comment.countDocuments();
+    const drafts = await Blog.countDocuments({ isPublished: false });
 
     const dashboardData = {
       recentBlogs,
-      totalBlogs: blogs,
-      totalComments,
-      draftBlogs,
+      blogs,
+      Comments,
+      drafts,
     };
     return res.status(200).json({
       success: true,
-      data: dashboardData,
+      dashboardData,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

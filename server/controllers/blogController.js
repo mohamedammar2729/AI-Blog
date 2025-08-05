@@ -143,7 +143,7 @@ export const addComment = async (req, res) => {
       content,
     });
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       message: "Comment added for review",
     });
@@ -155,9 +155,11 @@ export const addComment = async (req, res) => {
 export const getComments = async (req, res) => {
   try {
     const { blogId } = req.body;
-    const comments = await Comment.find({ blog: blogId, isApproved: true })
-      .sort({ createdAt: -1 }) // sort by latest first
-      // .populate("blog", "title"); // populate the blog title
+    const comments = await Comment.find({
+      blog: blogId,
+      isApproved: true,
+    }).sort({ createdAt: -1 }); // sort by latest first
+    // .populate("blog", "title"); // populate the blog title
 
     return res.status(200).json({
       success: true,
