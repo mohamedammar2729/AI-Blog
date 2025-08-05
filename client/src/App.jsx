@@ -1,11 +1,10 @@
-/* eslint-disable no-constant-condition */
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Blog from "./pages/Blog";
 import Layout from "./pages/admin/Layout";
 import Dashboard from "./pages/admin/Dashboard";
 import ListBlog from "./pages/admin/ListBlog";
-import AddBlog from "./pages/admin/Addblog";
+import AddBlog from "./pages/admin/AddBlog";
 import Comments from "./pages/admin/Comments";
 import Login from "./components/admin/Login";
 import "quill/dist/quill.snow.css";
